@@ -65,6 +65,9 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
             source ~/BlissStyleGAN/StyleGAN2/tensorflow/bin/activate
             ...
             ```
+      - However, CCDB later commments that for better performance, put the virtual environment directory into `$SLURM_TMPDIR`.
+        - not clear how to do this
+        - `$SLURM_TMPDIR` is a directory on the cluster, not the login node, so it can only be referenced from within a batch script (or within an interactive session) once the resources are allocated.
       - Note: the last line in the batch script is typically a call to `python` to execute some AI-related python script.  However, do not call `python` directly, but use `srun python ...` instead.
       - A full batch script is available in `tensorFlowTestBatch.sh` and assumes the `tensorflow` virtuual environment folder has been built as described above and that it is situated in `~/BlissStyleGAN/StyleGAN2/tensorflow/`.
       - The output from the batch script is found in a file named something like `tensorflowTest-cdr2678-66275923.out`.  The `cdr-2678` is the node on which the script ran and the `66275923` is the batch job id.  Both change every time the script is run.
@@ -82,4 +85,20 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
   - With no command given, once the interactive session's resources have been allocated, then anything `srun` at the bash prompt is actually executed in the cluster, and not in the local login-node.  To exit the interactive session, use `scancel <jobId>`
   - More information about `salloc` (and related SLURM commands) can be found in [Sheffield HPC Documentation](https://docs.hpc.shef.ac.uk/en/latest/referenceinfo/scheduler/SLURM/Common-commands/salloc.html).
 - Step 5 [Batch jobs](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en#Step_5:_Scripted_job_(sbatch))
-  - TBD
+  - Resource suggestions:
+     - CPUs: 6
+     - GPUs: CCDB suggest using only 1 GPU "unless you are certain that your program can use several".
+       - They note that TensorFlow and PyTorch use just one GPU.
+     - Memory: 3200M
+     - Duration: 28 days (Cedar)
+  - Basic steps (using bash commands):
+     -  set up the environment using `module` and `virtualenv`
+     -  transfer data to the compute node
+     -  start the executable
+  - Example of setting up the data, from within the batch script.  Note that the data is taken from the user's home directory, previously stored in a tar archive, and copied to the SLURM temporary directory.
+
+        ```
+        mkdir $SLURM_TMPDIR/dataset
+        tar xf ~/BlissStyleGAN/StyleGAN2/dataset.tar -C $SLURM_TMPDIR/dataset
+        ```
+  -  MORE TO COME...
