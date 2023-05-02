@@ -27,7 +27,7 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
       ```
   - Use pip to intall other packages, such a `Numpy`.
      - Note that if `module load scipy-stack` was done above, `Numpy` is already installed.
-     - If the `Scipy` stack was not loaded, and `Numpy` is still needed, run `pip install numpy`).
+     - If the `Scipy` stack was not loaded, and `Numpy` is still needed, run `pip install numpy`.
     - Strongly recommend using pip's `--no-index` flag to avoid loading the package from a global repository and to use CCDB's local package repository instead.  See [Available wheels](https://docs.alliancecan.ca/wiki/Python#Available_wheels) for information about packages and libraries that are available from CCDB.
     - Also, it is possible to use `pip` to install packages from inside a batch job script provided that:
       - the job can run on one node, and
@@ -67,7 +67,7 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
             ```
       - However, CCDB later commments that for better performance, put the virtual environment directory into `$SLURM_TMPDIR`.
         - not clear how to do this
-        - `$SLURM_TMPDIR` is a directory on the cluster, not the login node, so it can only be referenced from within a batch script (or within an interactive session) once the resources are allocated.
+        - `$SLURM_TMPDIR` is a directory on the cluster, not the login node, so it can only be referenced from within a batch script, or within an interactive session.
       - Note: the last line in the batch script is typically a call to `python` to execute some AI-related python script.  However, do not call `python` directly, but use `srun python ...` instead.
       - A full batch script is available in `tensorFlowTestBatch.sh` and assumes the `tensorflow` virtuual environment folder has been built as described above and that it is situated in `~/BlissStyleGAN/StyleGAN2/tensorflow/`.
       - The output from the batch script is found in a file named something like `tensorflowTest-cdr2678-66275923.out`.  The `cdr-2678` is the node on which the script ran and the `66275923` is the batch job id.  Both change every time the script is run.
@@ -80,25 +80,57 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
   - The `salloc` command takes an optional command to run.  If a command is given, then `salloc` will exit as soon as that command is completed.  Here is an example that prints the path to the SLURM_TMPDIR:
 
         ```
-        salloc ... srun echo "Hi"
+        salloc ... echo "Hi"
         ```
   - With no command given, once the interactive session's resources have been allocated, then anything `srun` at the bash prompt is actually executed in the cluster, and not in the local login-node.  To exit the interactive session, use `scancel <jobId>`
   - More information about `salloc` (and related SLURM commands) can be found in [Sheffield HPC Documentation](https://docs.hpc.shef.ac.uk/en/latest/referenceinfo/scheduler/SLURM/Common-commands/salloc.html).
 - Step 5 [Batch jobs](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en#Step_5:_Scripted_job_(sbatch))
   - Resource suggestions:
      - CPUs: 6
-     - GPUs: CCDB suggest using only 1 GPU "unless you are certain that your program can use several".
+     - GPUs: CCDB suggest using only 1 GPU "&hellip;unless you are certain that your program can use several".
        - They note that TensorFlow and PyTorch use just one GPU.
      - Memory: 3200M
      - Duration: 28 days (Cedar)
   - Basic steps (using bash commands):
-     -  set up the environment using `module` and `virtualenv`
-     -  transfer data to the compute node
+     -  set up the environment using `module` and `virtualenv`,
+     -  transfer data to the compute node,
+     -  define checkpoints for monitoring the job,
      -  start the executable
-  - Example of setting up the data, from within the batch script.  Note that the data is taken from the user's home directory, previously stored in a tar archive, and copied to the SLURM temporary directory.
+  - Example of transferring the data, from within the batch script.  The data is taken from the user's home directory, previously stored in a tar archive, and copied to a directory within the SLURM temporary directory.
 
         ```
         mkdir $SLURM_TMPDIR/dataset
         tar xf ~/BlissStyleGAN/StyleGAN2/dataset.tar -C $SLURM_TMPDIR/dataset
         ```
-  -  MORE TO COME...
+  - "Checkpointing" is monitoring the job as it runs.
+      - can set up job such that it can be interrupted and then continued.
+      - consult "checkpoint files".
+      - predetermine the number of 24-hour units needed.
+          - Formula: `n_units = n_epochs_total / n_epochs_per_24h`
+      - verify how many "epochs", or iterations, can be carried out in a 24-hour unit.
+      - Use argument `#SBATCH --array 1-<n_blocs>%1` to request a chain of `<n_blocs>` jobs.
+    - Example setting up checkpoint files and getting the most recent one:
+
+        ```
+        # File name extension.  Use '*.pt' for PyTorch checkpoints
+        CHECKPOINT_EXT="*.h5'
+        
+        # Save in home directory's scratch sub-folder
+        CHECKPOINTS=~/scratch/checkpoints/styleGAN2-checkpoints
+        
+        # Find all the checkpoint files in the CHECKPOINTS directory, filter their
+        # full paths such that the latest's full path is stored in LAST_CHECKPOINT.
+        LAST_CHECKPOINT=$(find $CHECKPOINTS -maxdepth 1 -name "$CHECKPOINT_EXT" -print0\
+                          | xargs -r -0 ls -1 -t | head -1)
+        ```
+    - Example of training dependant on the last checkpoint
+
+        ```
+        # Start training
+        if [-z "$LAST_CHECKPOINT" ]; then
+          # LAST_CHECKPOINT is non-existent, start from the beginnnig
+          python $SOURCEDIR/train.py --write-checkpoints-to $CHECKPOINTS ...
+        else
+          python $SOURCEDIR/train.py --load-checkpoint $LAST_CHECKPOINT --write-checkpoints-to $CHECKPOINTS ...
+        ```
+  -  MORE TO COME &hellip;
