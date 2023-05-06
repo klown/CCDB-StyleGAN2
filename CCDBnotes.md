@@ -6,10 +6,10 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
   - Use `virtualenv` command line command instead, but not before installing the version of python required for the project.  See step 3 below.
   - More information about [why Anaconda is to be avoided](https://docs.alliancecan.ca/wiki/Anaconda/en).
 - Step 2 [Archiving a data set](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en#Step_2:_Archiving_a_data_set)
-  - Do not submit the job with a data set of many invidual files.  Instead save those files into one tar archive
+  - Do not submit the job with a data set of many individual files.  Instead save those files into one tar archive
     - Example of creating a tar file, `$ tar cf dataset.tar ~/dataset/*`
 - Step 3 [Preparing your virtual environment](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en)
-  - [Loading an intperpreter](https://docs.alliancecan.ca/wiki/Python#Loading_an_interpreter), aka Python
+  - [Loading an interpreter](https://docs.alliancecan.ca/wiki/Python#Loading_an_interpreter), aka Python
      - use the `module` command to find and load the version of python desired.
        - to show all available versions of python:   `$ module avail python`
        - to load a specific version of python: `$ module load python/3.7.9`
@@ -65,11 +65,11 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
             source ~/BlissStyleGAN/StyleGAN2/tensorflow/bin/activate
             ...
             ```
-      - However, CCDB later commments that for better performance, put the virtual environment directory into `$SLURM_TMPDIR`.
+      - However, CCDB later comments that for better performance, put the virtual environment directory into `$SLURM_TMPDIR`.
         - not clear how to do this
         - `$SLURM_TMPDIR` is a directory on the cluster, not the login node, so it can only be referenced from within a batch script, or within an interactive session.
       - Note: the last line in the batch script is typically a call to `python` to execute some AI-related python script.  However, do not call `python` directly, but use `srun python ...` instead.
-      - A full batch script is available in `tensorFlowTestBatch.sh` and assumes the `tensorflow` virtuual environment folder has been built as described above and that it is situated in `~/BlissStyleGAN/StyleGAN2/tensorflow/`.
+      - A full batch script is available in `tensorFlowTestBatch.sh` and assumes the `tensorflow` virtual environment folder has been built as described above and that it is situated in `~/BlissStyleGAN/StyleGAN2/tensorflow/`.
       - The output from the batch script is found in a file named something like `tensorflowTest-cdr2678-66275923.out`.  The `cdr-2678` is the node on which the script ran and the `66275923` is the batch job id.  Both change every time the script is run.
 - Step 4 [Interactive Job](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en#Step_4:_Interactive_job_(salloc))
   - Use `salloc` as shown below. Note that `<def-someuser>` is either "def-whkchun" or "cpt-whkchun" for us.  When this is executed, there are a number of message indicating that the job and its resources are being allocate -- it takes a few seconds:
@@ -134,9 +134,5 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
           python $SOURCEDIR/train.py --load-checkpoint $LAST_CHECKPOINT --write-checkpoints-to $CHECKPOINTS ...
         ```
 ## StyleGAN2-ADA Tutorial
-These notes are based on the [How to Train StyleGAN2-ADA with Custom Dataset](https://towardsdatascience.com/how-to-train-stylegan2-ada-with-custom-dataset-dc268ff70544) article, but guided by the CCDB tutorial steps outlined in the prevsiou section.
-
-- 
-
-
+These notes are based on the [How to Train StyleGAN2-ADA with Custom Dataset](https://towardsdatascience.com/how-to-train-stylegan2-ada-with-custom-dataset-dc268ff70544) article, but guided by the CCDB tutorial steps outlined in the previous section.
   -  MORE TO COME &hellip;
