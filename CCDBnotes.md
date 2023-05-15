@@ -1,4 +1,4 @@
-# Using Digital Research Alliance of Canada Computer Cluster (CCDB) with Tensorflow
+# Digital Research Alliance of Canada Computer Cluster (CCDB) with Tensorflow and PyTorch
 ## Tutorial
 The following are summary notes based on the full [CCDB tutorial](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en).
 
@@ -8,7 +8,7 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
 - Step 2 [Archiving a data set](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en#Step_2:_Archiving_a_data_set)
   - Do not submit the job with a data set of many individual files.  Instead save those files into one tar archive
     - Example of creating a tar file, `$ tar cf dataset.tar ~/dataset/*`
-- Step 3 [Preparing your virtual environment](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en)
+- Step 3 (General) [Preparing your virtual environment](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en)
   - [Loading an interpreter](https://docs.alliancecan.ca/wiki/Python#Loading_an_interpreter), aka Python
      - use the `module` command to find and load the version of python desired.
        - to show all available versions of python:   `$ module avail python`
@@ -47,7 +47,7 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
             ```
       - then use the resulting `requirements.txt` in the SLURM batch script.  The script repeats the `module load` and `virtual env` steps, but then uses `pip install --no-index -r requirements.txt` to install the packages:
 
-    - [Tensorflow](https://docs.alliancecan.ca/wiki/Python#Installing_dependent_packages)
+    - Step 3 (Tensorflow) [Tensorflow](https://docs.alliancecan.ca/wiki/Python#Installing_dependent_packages)
       - [TensorFlow 1.x setup](https://docs.alliancecan.ca/wiki/TensorFlow#Installing_TensorFlow)
         - The setup is interactively loading the tensorflow1.x environment module from `StdEnv/2018` and the python 3 module, and then using pip to install tensorflow_gpu version 1.15.0.  This creates a `tensorflow` virtual environment in the directory `tensorflow`:
 
@@ -71,6 +71,25 @@ The following are summary notes based on the full [CCDB tutorial](https://docs.a
       - Note: the last line in the batch script is typically a call to `python` to execute some AI-related python script.  However, do not call `python` directly, but use `srun python ...` instead.
       - A full batch script is available in `tensorFlowTestBatch.sh` and assumes the `tensorflow` virtual environment folder has been built as described above and that it is situated in `~/BlissStyleGAN/StyleGAN2/tensorflow/`.
       - The output from the batch script is found in a file named something like `tensorflowTest-cdr2678-66275923.out`.  The `cdr-2678` is the node on which the script ran and the `66275923` is the batch job id.  Both change every time the script is run.
+  - Step 3 (Pytorch) [Pytorch](https://docs.alliancecan.ca/wiki/PyTorch)
+     - Use the CCDB module for Python 3.7, and create a `pytorch` virtual environmant.  Note that also lists the set of package installations for StyleGAN2-ADA using Pytorch.
+
+            ```
+            module load python/3.7
+            virtualenv --no-download pytorch
+            source pytorch/bin/activate
+            pip install --no-index --upgrade pip
+            pip install --no-index torch==1.7.1
+            pip install --no-index click
+            pip install --no-index pillow
+            pip install --no-index tqdm
+            pip install --no-index requests
+            pip install pyspng
+            pip install --no-index ninja
+            pip install imageio-ffmpeg==0.4.3
+            pip install --no-index psutil
+            pip install --no-index scipy
+            ```
 - Step 4 [Interactive Job](https://docs.alliancecan.ca/wiki/Tutoriel_Apprentissage_machine/en#Step_4:_Interactive_job_(salloc))
   - Use `salloc` as shown below. Note that `<def-someuser>` is either "def-whkchun" or "cpt-whkchun" for us.  When this is executed, there are a number of message indicating that the job and its resources are being allocate -- it takes a few seconds:
 
