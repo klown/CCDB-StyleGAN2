@@ -16,7 +16,7 @@
 # See step 4, Training StyleGAN2-ADA:
 # https://towardsdatascience.com/how-to-train-stylegan2-ada-with-custom-dataset-dc268ff70544#689f
 #
-# Inputs: preppedBlissSinceCharGrey.tar - a tarfile of .tfrecord` files.  The
+# Inputs: preppedBlissSinceCharGrey.tar - a tarfile of `.tfrecord` files.  The
 #         images with are 256x256
 # Ouputs: results - a folder for saving the model and sample results
 
